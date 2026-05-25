@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+    <title>妖妖电竞 · 三角洲俱乐部</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
+            font-family: 'Poppins', 'Segoe UI', 'Orbitron', system-ui, -apple-system, 'Inter', monospace;
+            color: #eef5ff;
+            padding: 2rem 1.5rem;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #141a2c;
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 8px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* 头部（无任何额外徽章） */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid rgba(59,130,246,0.5);
+            padding-bottom: 1rem;
+        }
+        .logo-area h1 {
+            font-size: 1.8rem;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 800;
+        }
+        .logo-area p {
+            font-size: 0.8rem;
+            color: #b9c7d9;
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+
+        /* 工具栏：默认不显示新建按钮，只有管理员模式才可见 */
+        .toolbar {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin: 12px 0 20px 0;
+        }
+        .btn-primary {
+            background: linear-gradient(95deg, #3b82f6, #2563eb);
+            border: none;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(59,130,246,0.4);
+            font-family: inherit;
+        }
+        .btn-primary:hover {
+            transform: scale(1.02);
+            background: linear-gradient(95deg, #60a5fa, #3b82f6);
+        }
+
+        /* 五个专区 (蓝箭头区域) */
+        .quick-zones {
+            margin: 20px 0 28px 0;
+            background: rgba(0, 10, 25, 0.6);
+            backdrop-filter: blur(8px);
+            border-radius: 60px;
+            padding: 10px 16px;
+            border: 1px solid rgba(59,130,246,0.6);
+        }
+        .zone-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.8rem;
+            color: #9ac8ff;
+            margin-bottom: 12px;
+            padding-left: 6px;
+        }
+        .zone-title i {
+            font-size: 1rem;
+            color: #3b82f6;
+        }
+        .zone-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 14px;
+            justify-content: flex-start;
+            align-items: center;
+        }
+        .zone-btn {
+            background: linear-gradient(145deg, #111b30, #0a1222);
+            border: 1px solid #2c3e66;
+            padding: 8px 24px;
+            border-radius: 48px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            color: #b9dcff;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .zone-btn i { color: #3b82f6; }
+        .zone-btn.active {
+            background: linear-gradient(115deg, #2563eb, #1e40af);
+            border-color: #93c5fd;
+            color: white;
+        }
+        .zone-btn.active i { color: white; }
+        .reset-filter {
+            background: rgba(255,255,240,0.05);
+            border: 1px solid #4b5563;
+            padding: 6px 18px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            color: #cbd5e6;
+        }
+        .reset-filter:hover { background: #1f2a44; }
+
+        /* 卡片网格 */
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 26px;
+            margin-top: 8px;
+            margin-bottom: 40px;
+        }
+
+        .order-card {
+            background: rgba(12, 17, 29, 0.85);
+            backdrop-filter: blur(8px);
+            border-radius: 28px;
+            border: 1px solid rgba(59,130,246,0.35);
+            overflow: hidden;
+            transition: all 0.25s ease;
+            display: flex;
+            flex-direction: column;
+        }
+        .order-card:hover {
+            transform: translateY(-5px);
+            border-color: #3b82f6;
+        }
+
+        /* 图片区域 - 普通模式下不可点击，无文字提示 */
+        .card-img-slot {
+            width: 100%;
+            height: 170px;
+            background: #01010130;
+            position: relative;
+            overflow: hidden;
+            background-color: #0f1420;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #2a2f42;
+        }
+        .card-img-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        /* 普通模式占位符无任何可上传暗示 */
+        .img-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: #6c7a94;
+            font-size: 0.75rem;
+        }
+        .img-placeholder i {
+            font-size: 2rem;
+            opacity: 0.4;
+        }
+        /* 管理员模式下出现的图片操作提示（默认隐藏） */
+        .admin-img-hint {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 20px;
+            padding: 4px 8px;
+            font-size: 10px;
+            color: #60a5fa;
+            pointer-events: none;
+            font-weight: bold;
+            display: none;
+        }
+        .admin-mode .admin-img-hint {
+            display: block;
+        }
+        .admin-mode .card-img-slot {
+            cursor: pointer;
+        }
+
+        /* 卡片内容 */
+        .card-content {
+            padding: 16px 18px 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .card-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            background: linear-gradient(145deg, #fff, #b9dcff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .tag {
+            background: #2a2418;
+            border-radius: 20px;
+            padding: 4px 10px;
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #60a5fa;
+            border: 0.5px solid #3b82f650;
+        }
+        .card-desc {
+            font-size: 0.8rem;
+            line-height: 1.35;
+            color: #cbd5e6;
+            margin: 8px 0 12px;
+            background: #00000030;
+            padding: 8px 10px;
+            border-radius: 16px;
+            border-left: 3px solid #3b82f6;
+        }
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 8px;
+            margin-bottom: 16px;
+            font-weight: bold;
+        }
+        .price { color: #90cdf4; font-size: 1.1rem; font-family: monospace; }
+        .btn-order {
+            background: rgba(59,130,246,0.2);
+            border: 1px solid #3b82f6;
+            padding: 8px 0;
+            border-radius: 40px;
+            font-weight: bold;
+            color: #bfdbfe;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .btn-order:hover {
+            background: #3b82f6;
+            color: #0a0f1e;
+        }
+        /* 管理员卡片操作按钮（默认隐藏） */
+        .card-actions {
+            display: none;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 12px;
+        }
+        .admin-mode .card-actions {
+            display: flex;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            color: #8592b0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            padding: 5px;
+        }
+        .icon-btn:hover { color: #3b82f6; }
+        .delete-btn:hover { color: #f97316; }
+
+        /* 底部脚注 - 隐藏敏感词汇，只保留普通提示 */
+        .footnote {
+            background: #03070faa;
+            border-radius: 24px;
+            padding: 1rem 1.6rem;
+            margin-top: 2rem;
+            font-size: 0.75rem;
+            border-top: 1px solid #3b82f640;
+            backdrop-filter: blur(8px);
+            text-align: center;
+            color: #9ca3af;
+        }
+
+        /* 模态框 - 编辑/新增（仅在管理模式下调用） */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-card {
+            background: #11161f;
+            max-width: 450px;
+            width: 90%;
+            border-radius: 32px;
+            border: 1px solid #3b82f6;
+            padding: 24px;
+        }
+        .modal-card h3 { margin-bottom: 20px; color: #93c5fd; }
+        .modal-card input, .modal-card textarea {
+            width: 100%;
+            background: #1e2538;
+            border: 1px solid #2f3a55;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 20px;
+            color: white;
+            font-family: inherit;
+        }
+        .file-preview-area {
+            background: #070b14;
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+            margin: 6px 0;
+        }
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3b82f6;
+            color: #93c5fd;
+            padding: 8px 16px;
+            border-radius: 40px;
+            cursor: pointer;
+        }
+
+        /* 隐藏的管理员密码弹窗（轻提示） */
+        .hidden-auth {
+            position: fixed;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            pointer-events: none;
+            z-index: 999;
+        }
+        .toast-msg {
+            display: inline-block;
+            background: #1e293bdd;
+            backdrop-filter: blur(8px);
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            color: #90cdf4;
+            pointer-events: none;
+        }
+        @media (max-width: 680px) {
+            body { padding: 1rem; }
+            .zone-buttons { gap: 10px; }
+            .zone-btn { padding: 6px 18px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- 头部无任何多余徽章 -->
+    <div class="header">
+        <div class="logo-area">
+            <h1>⚡ 妖妖电竞 <span style="font-size:1rem;">| 三角洲俱乐部</span></h1>
+            <p>yaoyao.com // 战术单位 · 精英陪玩</p>
+        </div>
+    </div>
+
+    <!-- 工具栏仅管理员可见（默认隐藏） -->
+    <div class="toolbar" id="adminToolbar" style="display: none;">
+        <button class="btn-primary" id="addCardBtn"><i class="fas fa-plus-circle"></i> 新建订单 + 插入图片</button>
+    </div>
+
+    <!-- 五个专区 (蓝箭头) -->
+    <div class="quick-zones">
+        <div class="zone-title">
+            <i class="fas fa-arrow-down"></i> <span>热门专区</span> <i class="fas fa-arrow-down"></i>
+        </div>
+        <div class="zone-buttons">
+            <button class="zone-btn" data-filter="体验单"><i class="fas fa-star"></i> 体验单</button>
+            <button class="zone-btn" data-filter="小时单"><i class="fas fa-clock"></i> 小时单</button>
+            <button class="zone-btn" data-filter="趣味玩法"><i class="fas fa-gamepad"></i> 趣味玩法</button>
+            <button class="zone-btn" data-filter="猛攻单"><i class="fas fa-skull-crossbones"></i> 猛攻单</button>
+            <button class="zone-btn" data-filter="爽吃玩法"><i class="fas fa-egg"></i> 爽吃玩法</button>
+            <span class="reset-filter" id="resetFilterBtn"><i class="fas fa-undo-alt"></i> 全部订单</span>
+        </div>
+    </div>
+
+    <div id="cardsGrid" class="cards-grid"></div>
+
+    <div class="footnote" id="secretEntry">
+        <i class="fas fa-shield-alt"></i> 妖妖电竞 · 三角洲俱乐部护航规则：所有订单均为打手选图，默认绝密地图。
+    </div>
+</div>
+
+<!-- 编辑/新增模态框 (仅管理员调用) -->
+<div id="editorModal" class="modal">
+    <div class="modal-card">
+        <h3 id="modalTitle"><i class="fas fa-edit"></i> 编辑订单卡片</h3>
+        <input type="text" id="editTitle" placeholder="卡片标题">
+        <input type="text" id="editTag" placeholder="标签 (例：赌约单)">
+        <textarea id="editDesc" rows="3" placeholder="描述信息：规则/玩法"></textarea>
+        <input type="text" id="editPrice" placeholder="价格/保底">
+        <div class="file-preview-area">
+            <label><i class="fas fa-camera"></i> 上传/更换三角洲截图</label>
+            <input type="file" id="modalImgUpload" accept="image/jpeg,image/png,image/webp">
+        </div>
+        <div class="modal-buttons">
+            <button class="btn-outline" id="modalCancelBtn">取消</button>
+            <button class="btn-primary" id="modalConfirmBtn">保存修改</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ---------- 卡片数据 ----------
+    let cardsData = [
+        { id: "card_1", title: "黄金矿工", tag: "🔥 赌约单", desc: "单局赌约单 | 488保1688W，刺激矿工夺金，撤离失败不结算。", price: "488 保 1688W", image: null, zone: "猛攻单" },
+        { id: "card_2", title: "收集趣味单", tag: "📦 收集单", desc: "只算金且只算金的数量不看格数，撤离失败不算，单局18个金即可结单。", price: "18金结单 / 超高爆率", image: null, zone: "趣味玩法" },
+        { id: "card_3", title: "3X3任务单", tag: "🎯 特殊任务", desc: "打手根据情况选图，指定航天加价20%，保底也增加20%。", price: "基础保底 +20%", image: null, zone: "小时单" },
+        { id: "card_4", title: "镭射单", tag: "⚡ 火力单", desc: "588保1888W｜单局带出16个镭射，暴力美学。", price: "588 保 1888W", image: null, zone: "猛攻单" },
+        { id: "card_5", title: "战斗趣味单", tag: "💥 战斗狂欢", desc: "688保1588W ｜ 爽快刚枪，高额回报。", price: "688 保 1588W", image: null, zone: "猛攻单" },
+        { id: "card_6", title: "猜物博弈", tag: "🎲 博弈单", desc: "单局带出488发金弹或红单，不够不结。一颗AW算30发金弹。", price: "金弹赌约 488发", image: null, zone: "趣味玩法" },
+        { id: "card_7", title: "爽吃金蛋", tag: "🥚 地图特色", desc: "航天基地绝密爽局，688保1588W，金蛋爆仓体验。", price: "688 保 1588W", image: null, zone: "爽吃玩法" },
+        { id: "card_8", title: "妖妖迷宫", tag: "🌀 迷宫探险", desc: "特殊迷宫规则，找出隐藏金库，撤离翻倍奖励。", price: "888 保 2088W", image: null, zone: "趣味玩法" },
+        { id: "card_9", title: "翻翻乐 · 赖子模式", tag: "🃏 趣味组合", desc: "单局出6个相同小金，心泪算两个赖子，大红/小红赖子规则。", price: "翻倍乐透", image: null, zone: "趣味玩法" },
+        { id: "card_10", title: "金光闪闪", tag: "✨ 赏金猎人", desc: "赏金悬赏：单局带出指定数量大红/金条，立即额外奖励。", price: "保底 588W + 赏金", image: null, zone: "体验单" },
+        { id: "card_11", title: "堆堆乐", tag: "🧱 收藏单", desc: "指定物品堆叠，撤离结算系数暴增。", price: "依据层数结算", image: null, zone: "趣味玩法" },
+        { id: "card_12", title: "心愿悬赏", tag: "🎁 许愿单", desc: "老板提出心愿目标，打手配合完成，趣味互动。", price: "定制化报价", image: null, zone: "体验单" },
+        { id: "card_new_1", title: "新兵体验营", tag: "🎖️ 体验单", desc: "专为新手打造，低门槛体验三角洲魅力。", price: "199 体验保底", image: null, zone: "体验单" },
+        { id: "card_new_2", title: "小时战神", tag: "⏱️ 小时单", desc: "按时计费，精英打手按小时陪玩。", price: "98/小时 起", image: null, zone: "小时单" },
+        { id: "card_new_3", title: "猛攻强袭", tag: "⚔️ 猛攻单", desc: "全图猛攻打法，保底2000W输出。", price: "888 保 2388W", image: null, zone: "猛攻单" },
+        { id: "card_new_4", title: "爽吃大作战", tag: "🍳 爽吃玩法", desc: "金蛋/红蛋数量翻倍，爽快刷金。", price: "888 保 1988W", image: null, zone: "爽吃玩法" }
+    ];
+
+    let activeZoneFilter = null;
+    let isAdmin = false;          // 默认非管理员，无任何管理痕迹
+    let currentEditId = null;
+
+    function genId() { return 'card_' + Date.now() + '_' + Math.random().toString(36).substr(2, 8); }
+    function getFiltered() { return activeZoneFilter ? cardsData.filter(c => c.zone === activeZoneFilter) : [...cardsData]; }
+
+    // 渲染卡片：根据 isAdmin 决定是否显示管理控件及图片可点击
+    function renderCards() {
+        const grid = document.getElementById('cardsGrid');
+        if (!grid) return;
+        const filtered = getFiltered();
+        grid.innerHTML = '';
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:60px; background:#0f1422aa; border-radius:48px;">
+                                <i class="fas fa-filter" style="font-size:40px; color:#3b82f6;"></i><br/>暂无此类订单</div>`;
+            return;
+        }
+        filtered.forEach(card => {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = 'order-card';
+            if (isAdmin) cardDiv.classList.add('admin-mode');
+
+            // 图片插槽
+            const imgSlot = document.createElement('div');
+            imgSlot.className = 'card-img-slot';
+            if (card.image && card.image !== '') {
+                const img = document.createElement('img');
+                img.src = card.image;
+                imgSlot.appendChild(img);
+            } else {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'img-placeholder';
+                placeholder.innerHTML = `<i class="fas fa-image"></i><span>暂无图片</span>`;
+                imgSlot.appendChild(placeholder);
+            }
+            // 管理员提示浮层 (仅在管理员模式显示)
+            const hint = document.createElement('div');
+            hint.className = 'admin-img-hint';
+            hint.innerHTML = '<i class="fas fa-upload"></i> 点此换图';
+            imgSlot.appendChild(hint);
+            
+            // 只有管理员模式下才可点击上传
+            if (isAdmin) {
+                imgSlot.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.accept = 'image/jpeg,image/png,image/webp';
+                    fileInput.onchange = (ev) => {
+                        const file = ev.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = (e2) => {
+                                card.image = e2.target.result;
+                                renderCards();
+                            };
+                            reader.readAsDataURL(file);
+                        }
+                    };
+                    fileInput.click();
+                });
+            }
+
+            // 内容区
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'card-content';
+            let actionsHtml = '';
+            if (isAdmin) {
+                actionsHtml = `<div class="card-actions">
+                                <button class="icon-btn edit-card" data-id="${card.id}"><i class="fas fa-pen"></i> 编辑</button>
+                                <button class="icon-btn delete-card" data-id="${card.id}"><i class="fas fa-trash-alt"></i> 删除</button>
+                              </div>`;
+            } else {
+                actionsHtml = '';   // 普通模式完全不显示操作区域
+            }
+            contentDiv.innerHTML = `
+                <div class="card-header">
+                    <span class="card-title">${escapeHtml(card.title)}</span>
+                    <span class="tag">${escapeHtml(card.tag)}</span>
+                </div>
+                <div class="card-desc">${escapeHtml(card.desc)}</div>
+                <div class="price-row"><span class="price">💰 ${escapeHtml(card.price)}</span></div>
+                <button class="btn-order"><i class="fas fa-crosshairs"></i> 立即下单</button>
+                ${actionsHtml}
+            `;
+            cardDiv.appendChild(imgSlot);
+            cardDiv.appendChild(contentDiv);
+            grid.appendChild(cardDiv);
+        });
+
+        // 绑定事件 (仅当管理员模式时，按钮才存在)
+        if (isAdmin) {
+            document.querySelectorAll('.edit-card').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    openEditModal(btn.dataset.id);
+                });
+            });
+            document.querySelectorAll('.delete-card').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const id = btn.dataset.id;
+                    if (confirm('确定删除此订单吗？')) {
+                        const idx = cardsData.findIndex(c => c.id === id);
+                        if (idx !== -1) cardsData.splice(idx, 1);
+                        renderCards();
+                    }
+                });
+            });
+        }
+        // 下单按钮通用
+        document.querySelectorAll('.btn-order').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const title = btn.closest('.order-card')?.querySelector('.card-title')?.innerText || '订单';
+                alert(`✅ 已接单: ${title}\n请联系妖妖电竞客服确认细节`);
+            });
+        });
+    }
+
+    function escapeHtml(str) { if(!str) return ''; return str.replace(/[&<>]/g, function(m){ return m==='&'?'&amp;': m==='<'?'&lt;':'&gt;'; }); }
+
+    // 编辑模态框 (仅管理员模式调用)
+    function openEditModal(cardId) {
+        const card = cardsData.find(c => c.id === cardId);
+        if (!card) return;
+        currentEditId = cardId;
+        const modal = document.getElementById('editorModal');
+        document.getElementById('editTitle').value = card.title;
+        document.getElementById('editTag').value = card.tag;
+        document.getElementById('editDesc').value = card.desc;
+        document.getElementById('editPrice').value = card.price;
+        document.getElementById('modalImgUpload').value = '';
+        modal.style.display = 'flex';
+    }
+
+    function saveEditModal() {
+        if (!currentEditId) return;
+        const idx = cardsData.findIndex(c => c.id === currentEditId);
+        if (idx === -1) return;
+        const newTitle = document.getElementById('editTitle').value.trim();
+        const newTag = document.getElementById('editTag').value.trim();
+        const newDesc = document.getElementById('editDesc').value.trim();
+        const newPrice = document.getElementById('editPrice').value.trim();
+        if (newTitle) cardsData[idx].title = newTitle;
+        if (newTag) cardsData[idx].tag = newTag;
+        if (newDesc) cardsData[idx].desc = newDesc;
+        if (newPrice) cardsData[idx].price = newPrice;
+        const fileInput = document.getElementById('modalImgUpload');
+        if (fileInput.files && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    cardsData[idx].image = e.target.result;
+                    renderCards();
+                    closeModal();
+                };
+                reader.readAsDataURL(file);
+                return;
+            } else {
+                alert("图片格式无效");
+                return;
+            }
+        }
+        renderCards();
+        closeModal();
+    }
+
+    function createNewCard() {
+        const newTitle = document.getElementById('editTitle').value.trim();
+        if (!newTitle) { alert('请填写标题'); return; }
+        const newTag = document.getElementById('editTag').value.trim();
+        const newDesc = document.getElementById('editDesc').value.trim();
+        const newPrice = document.getElementById('editPrice').value.trim();
+        const fileInput = document.getElementById('modalImgUpload');
+        const addCard = (imgData = null) => {
+            const newCard = {
+                id: genId(),
+                title: newTitle,
+                tag: newTag || "自定义",
+                desc: newDesc || "自定义三角洲规则",
+                price: newPrice || "联系客服",
+                image: imgData,
+                zone: "趣味玩法"
+            };
+            cardsData.push(newCard);
+            if (activeZoneFilter) { activeZoneFilter = null; document.querySelectorAll('.zone-btn').forEach(btn => btn.classList.remove('active')); }
+            renderCards();
+            closeModal();
+        };
+        if (fileInput.files && fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = (e) => addCard(e.target.result);
+                reader.readAsDataURL(file);
+                return;
+            }
+        }
+        addCard(null);
+    }
+
+    function closeModal() {
+        document.getElementById('editorModal').style.display = 'none';
+        currentEditId = null;
+    }
+
+    // 专区筛选
+    function setFilter(zone) {
+        activeZoneFilter = zone;
+        document.querySelectorAll('.zone-btn').forEach(btn => {
+            if (btn.dataset.filter === zone) btn.classList.add('active');
+            else btn.classList.remove('active');
+        });
+        renderCards();
+    }
+    function resetFilter() { activeZoneFilter = null; document.querySelectorAll('.zone-btn').forEach(btn => btn.classList.remove('active')); renderCards(); }
+
+    // ---------- 隐藏管理员入口：连续点击底部 footnote 区域5次 ----------
+    let clickCount = 0;
+    let clickTimer = null;
+    function setupSecretEntry() {
+        const secretArea = document.getElementById('secretEntry');
+        secretArea.style.cursor = 'pointer';
+        secretArea.addEventListener('click', () => {
+            clickCount++;
+            if (clickTimer) clearTimeout(clickTimer);
+            clickTimer = setTimeout(() => { clickCount = 0; }, 800);
+            if (clickCount >= 5) {
+                clickCount = 0;
+                // 弹出密码验证框（不暴露任何管理字样，只是普通弹窗风格）
+                const pwd = prompt("验证身份", "");
+                if (pwd === "yaoyao2025") {
+                    isAdmin = true;
+                    // 显示管理员工具栏
+                    const adminToolbar = document.getElementById('adminToolbar');
+                    if (adminToolbar) adminToolbar.style.display = 'flex';
+                    // 重新渲染卡片，显示管理控件
+                    renderCards();
+                    // 绑定新建按钮事件
+                    const addBtn = document.getElementById('addCardBtn');
+                    if (addBtn) {
+                        addBtn.onclick = () => {
+                            currentEditId = null;
+                            document.getElementById('editTitle').value = '';
+                            document.getElementById('editTag').value = '上新单';
+                            document.getElementById('editDesc').value = '自定义三角洲规则';
+                            document.getElementById('editPrice').value = '';
+                            document.getElementById('modalImgUpload').value = '';
+                            document.getElementById('editorModal').style.display = 'flex';
+                        };
+                    }
+                    alert("管理员模式已启用，可编辑/新增/上传图片");
+                } else if (pwd !== null) {
+                    alert("验证失败");
+                }
+            }
+        });
+    }
+
+    // 初始化: 默认普通模式，没有任何管理元素
+    function init() {
+        renderCards();
+        setupSecretEntry();
+        // 给专区按钮绑定筛选
+        document.querySelectorAll('.zone-btn').forEach(btn => {
+            btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+        });
+        document.getElementById('resetFilterBtn').addEventListener('click', resetFilter);
+        // 模态框按钮事件
+        const modalConfirm = document.getElementById('modalConfirmBtn');
+        const modalCancel = document.getElementById('modalCancelBtn');
+        modalConfirm.onclick = () => {
+            if (!isAdmin) { alert('无权限'); return; }
+            if (currentEditId) saveEditModal();
+            else createNewCard();
+        };
+        modalCancel.onclick = closeModal;
+        window.onclick = (e) => { if (e.target === document.getElementById('editorModal')) closeModal(); };
+    }
+
+    init();
+</script>
+</body>
+</html>
